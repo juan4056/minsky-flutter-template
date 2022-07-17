@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template_app/authentication/authentication.dart';
 import 'package:template_app/dashboard/cubit/dashboard_cubit.dart';
 
 class Dashboard extends StatelessWidget {
@@ -11,15 +12,25 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: BlocBuilder<DashboardCubit, DashboardState>(
-        builder: (context, state) {
-          return initialLayout(context);
-        },
-      ),
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  context.read<DashboardCubit>().logout().then((value) =>
+                      context.read<AuthenticationBloc>().add(LoggedOut()));
+                },
+                icon: const Icon(Icons.logout),
+                tooltip: 'Log Out',
+              ),
+            ],
+          ),
+          body: initialLayout(context),
+        );
+      },
     );
   }
 

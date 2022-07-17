@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "635332753089",
+    "project_id": "proyectoprueba-da4f0",
+    "storage_bucket": "proyectoprueba-da4f0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635332753089:android:3c26b4c8ecdf89dc1bc640",
+        "android_client_info": {
+          "package_name": "com.minsky.template_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "635332753089-0bob5brded9urfibhiph41gm0kr77eqq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdyuNqioPuKaVPKpOXa3EK-dvB_VO5CmQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "635332753089-0bob5brded9urfibhiph41gm0kr77eqq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

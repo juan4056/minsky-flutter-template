@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:template_app/dashboard/dashboard.dart';
+import 'package:template_app/authentication/authentication.dart';
 import 'package:template_app/login/login.dart';
 
 import '../cubit/login_cubit.dart';
@@ -50,18 +50,10 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state.status == LoginStatus.error) {
-            buildErrorLayout();
+            buildErrorLayout(state.errorCode);
           } else if (state.status == LoginStatus.success) {
             clearTextData();
-            Navigator.push<void>(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Dashboard(
-                  title: 'Dashboard',
-                  username: state.username,
-                ),
-              ),
-            );
+            context.read<AuthenticationBloc>().add(LoggedIn());
           }
         },
         builder: (context, state) {
@@ -112,10 +104,16 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-  ScaffoldFeatureController buildErrorLayout() =>
+  ScaffoldFeatureController buildErrorLayout(String errorCode) =>
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter username/password!'),
+        SnackBar(
+          content: Text(errorCode == 'incomplete-fields'
+              ? 'Please enter username/password!'
+              : errorCode == 'user-not-found'
+                  ? 'No user found for that email.'
+                  : errorCode == 'wrong-password'
+                      ? 'Wrong password provided for that user.'
+                      : 'Unknown error'),
         ),
       );
 
