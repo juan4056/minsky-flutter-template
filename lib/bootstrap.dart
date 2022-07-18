@@ -23,6 +23,8 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
 
+  WidgetsFlutterBinding.ensureInitialized();
+
   await runZonedGuarded(
     () async {
       await BlocOverrides.runZoned(
