@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +20,10 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider(
-      create: (context) => AuthenticationRepository(FirebaseAuth.instance),
+      create: (context) => AuthenticationRepository(
+        FirebaseAuth.instance,
+        FirebaseFirestore.instance,
+      ),
       child: BlocProvider(
         create: (context) => AuthenticationBloc(
             authenticationRepository: context.read<AuthenticationRepository>())
@@ -40,41 +44,49 @@ class _AppView extends StatefulWidget {
 class _AppViewState extends State<_AppView> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorSchemeSeed: Colors.blue,
-        useMaterial3: true,
-      ),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state is Uninitialized) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is Unauthenticated) {
-            return BlocProvider(
-              create: ((context) => LoginCubit(
-                  authRepository: context.read<AuthenticationRepository>())),
-              child: const LoginPage(title: 'Login'),
-            );
-          }
-          if (state is Authenticated) {
-            return BlocProvider(
-              create: ((context) => DashboardCubit(
-                  authRepository: context.read<AuthenticationRepository>())),
-              child: Dashboard(
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        if (state is Uninitialized) {
+          return MyMaterialApp(
+              context, const Center(child: CircularProgressIndicator()));
+        }
+        if (state is Unauthenticated) {
+          return BlocProvider(
+            create: ((context) => LoginCubit(
+                authRepository: context.read<AuthenticationRepository>())),
+            child: MyMaterialApp(context, const LoginPage(title: 'Login')),
+          );
+        }
+        if (state is Authenticated) {
+          return BlocProvider(
+            create: ((context) => DashboardCubit(
+                authRepository: context.read<AuthenticationRepository>())),
+            child: MyMaterialApp(
+              context,
+              Dashboard(
                 title: 'Login',
                 username: state.displayName,
               ),
-            );
-          }
-          return Container();
-        },
-      ),
+            ),
+          );
+        }
+        return Container();
+      },
     );
   }
+}
+
+Widget MyMaterialApp(BuildContext context, Widget widget) {
+  return MaterialApp(
+    theme: ThemeData(
+      colorSchemeSeed: Colors.blue,
+      useMaterial3: true,
+    ),
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+    ],
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: widget,
+  );
 }
