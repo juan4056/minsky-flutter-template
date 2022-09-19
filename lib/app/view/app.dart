@@ -8,6 +8,7 @@ import 'package:template_app/dashboard/dashboard.dart';
 import 'package:template_app/l10n/l10n.dart';
 import 'package:template_app/login/login.dart';
 import 'package:template_app/repositories/auth_repository.dart';
+import 'package:template_app/repositories/data_repository.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -19,11 +20,20 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthenticationRepository(
-        FirebaseAuth.instance,
-        FirebaseFirestore.instance,
-      ),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => AuthenticationRepository(
+            FirebaseAuth.instance,
+          ),
+        ),
+        RepositoryProvider(
+          create: (context) => DataRepository(
+            FirebaseAuth.instance,
+            FirebaseFirestore.instance,
+          ),
+        ),
+      ],
       child: BlocProvider(
         create: (context) => AuthenticationBloc(
             authenticationRepository: context.read<AuthenticationRepository>())
@@ -44,49 +54,37 @@ class _AppView extends StatefulWidget {
 class _AppViewState extends State<_AppView> {
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        colorSchemeSeed: Colors.blue,
+        useMaterial3: true,
+      ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: _HomeView(),
+    );
+  }
+}
+
+class _HomeView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
       builder: (context, state) {
         if (state is Uninitialized) {
-          return MyMaterialApp(
-              context, const Center(child: CircularProgressIndicator()));
+          return const Center(child: CircularProgressIndicator());
         }
         if (state is Unauthenticated) {
-          return BlocProvider(
-            create: ((context) => LoginCubit(
-                authRepository: context.read<AuthenticationRepository>())),
-            child: MyMaterialApp(context, const LoginPage(title: 'Login')),
-          );
+          return const LoginPage();
         }
         if (state is Authenticated) {
-          return BlocProvider(
-            create: ((context) => DashboardCubit(
-                authRepository: context.read<AuthenticationRepository>())),
-            child: MyMaterialApp(
-              context,
-              Dashboard(
-                title: 'Login',
-                username: state.displayName,
-              ),
-            ),
-          );
+          return DashboardPage(username: state.displayName);
         }
         return Container();
       },
     );
   }
-}
-
-Widget MyMaterialApp(BuildContext context, Widget widget) {
-  return MaterialApp(
-    theme: ThemeData(
-      colorSchemeSeed: Colors.blue,
-      useMaterial3: true,
-    ),
-    localizationsDelegates: const [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-    ],
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: widget,
-  );
 }

@@ -2,21 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template_app/authentication/authentication.dart';
 import 'package:template_app/dashboard/cubit/dashboard_cubit.dart';
-import 'package:template_app/models/user.dart';
+import 'package:template_app/dashboard/form/form.dart';
+import 'package:template_app/models/product.dart';
 import 'package:template_app/repositories/auth_repository.dart';
+import 'package:template_app/repositories/data_repository.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key, required this.title, required this.username})
-      : super(key: key);
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({Key? key, required this.username}) : super(key: key);
 
-  final String title;
   final String username;
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => DashboardCubit(
+        authRepository: context.read<AuthenticationRepository>(),
+        dataRepository: context.read<DataRepository>(),
+      ),
+      child: _DashboardView(
+        username: username,
+      ),
+    );
+  }
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DashboardView extends StatefulWidget {
+  const _DashboardView({Key? key, required this.username}) : super(key: key);
+
+  final String username;
+
+  @override
+  State<_DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<_DashboardView> {
   @override
   void initState() {
     super.initState();
@@ -29,7 +48,6 @@ class _DashboardState extends State<Dashboard> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(widget.title),
             actions: [
               IconButton(
                 onPressed: () async {
@@ -74,8 +92,8 @@ class _DashboardState extends State<Dashboard> {
             const SizedBox(height: 10),
             for (var product in products) ...[
               ListTile(
-                title: Text(product.name),
-                subtitle: Text('${product.length}'),
+                title: Text(product.name ?? ''),
+                subtitle: Text('${product.quantity}'),
               ),
             ]
           ],
@@ -85,100 +103,7 @@ class _DashboardState extends State<Dashboard> {
   Widget addWidget(BuildContext context) {
     return const AlertDialog(
       title: Text('Add Product'),
-      content: _NewProductForm(),
-    );
-  }
-}
-
-class _NewProductForm extends StatefulWidget {
-  const _NewProductForm({Key? key}) : super(key: key);
-
-  @override
-  _NewProductFormState createState() => _NewProductFormState();
-}
-
-class _NewProductFormState extends State<_NewProductForm> {
-  final nameController = TextEditingController();
-  final lengthController = TextEditingController();
-  bool isActive = false;
-
-  @override
-  void initState() {
-    nameController.addListener(() {
-      setState(() => isActive =
-          nameController.text.isNotEmpty && lengthController.text.isNotEmpty);
-    });
-    lengthController.addListener(() {
-      setState(() => isActive =
-          nameController.text.isNotEmpty && lengthController.text.isNotEmpty);
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    lengthController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Name',
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              keyboardType: TextInputType.number,
-              controller: lengthController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Length',
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.all(10),
-            child: ElevatedButton(
-              onPressed: (isActive)
-                  ? () {
-                      context.read<DashboardCubit>().addProduct(
-                          nameController.text,
-                          int.parse(lengthController.text));
-                      Navigator.of(context).pop();
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.teal,
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text(
-                'Save',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      content: ProductFormView(),
     );
   }
 }

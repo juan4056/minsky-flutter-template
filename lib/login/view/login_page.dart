@@ -2,19 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template_app/authentication/authentication.dart';
 import 'package:template_app/login/login.dart';
+import 'package:template_app/repositories/auth_repository.dart';
 
-import '../cubit/login_cubit.dart';
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => LoginCubit(
+        authRepository: context.read<AuthenticationRepository>(),
+      ),
+      child: const _LoginView(),
+    );
+  }
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginView extends StatefulWidget {
+  const _LoginView({Key? key}) : super(key: key);
+
+  @override
+  State<_LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<_LoginView> {
   late FocusNode usernameFocus;
   late FocusNode passwordFocus;
   late FocusNode loginBtnFocus;
@@ -44,9 +55,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(),
       body: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state.status == LoginStatus.error) {

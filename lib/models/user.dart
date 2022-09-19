@@ -23,22 +23,3 @@ class MyUser extends Equatable {
   @override
   List<Object?> get props => [products];
 }
-
-class Product {
-  Product({required this.name, required this.length});
-
-  factory Product.fromMap(Map<String, Object?> json) => Product(
-        name: json['name'] as String,
-        length: json['length'] as int,
-      );
-
-  final String name;
-  final int length;
-
-  Map<String, Object?> toMap() {
-    return {
-      'name': name,
-      'length': length,
-    };
-  }
-}
