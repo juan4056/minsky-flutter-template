@@ -25,6 +25,12 @@ dependencies:
   firebase_core: ^1.19.2
   firebase_auth: ^3.4.2
   cloud_firestore: ^3.3.0
+  latlong2: ^0.8.1
+  flutter_map: ^2.2.0
+  google_fonts: ^3.0.1
+  flutter_map_location_marker: ^4.1.4
+  cached_network_image: ^3.2.1
+  location: ^4.3.0
 
 dev_dependencies:
   flutter_test:

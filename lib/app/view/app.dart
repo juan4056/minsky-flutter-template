@@ -64,6 +64,7 @@ class _AppViewState extends State<_AppView> {
         GlobalMaterialLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      debugShowCheckedModeBanner: false,
       home: _HomeView(),
     );
   }

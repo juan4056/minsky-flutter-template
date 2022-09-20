@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:template_app/authentication/authentication.dart';
 import 'package:template_app/dashboard/cubit/dashboard_cubit.dart';
 import 'package:template_app/dashboard/form/form.dart';
+import 'package:template_app/map/view/map_page.dart';
 import 'package:template_app/models/product.dart';
 import 'package:template_app/repositories/auth_repository.dart';
 import 'package:template_app/repositories/data_repository.dart';
@@ -66,7 +67,11 @@ class _DashboardViewState extends State<_DashboardView> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              showDialog(context: context, builder: addWidget);
+              // showDialog(context: context, builder: addWidget);
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => const MapPage()),
+              );
             },
             tooltip: 'Increment Counter',
             child: const Icon(Icons.add),
